@@ -35,6 +35,11 @@ const app = http.createServer((req, res) => {
     "Access-Control-Allow-Headers",
     "Access-Control-Allow-Headers, Origin, Accept, X-Requested-With, Content-Type, Access-Control-Request-Method, Access-Control-Request-Headers"
   );
+
+  if (req.method === "OPTIONS") {
+    res.end();
+  }
+
   const url = req.url;
   const items = url.split("/");
   const method = req.method;
@@ -89,13 +94,16 @@ const app = http.createServer((req, res) => {
       if (data.task) {
         todo.task = data.task;
       }
-      if (data.done) {
+
+      if (typeof data.done === "boolean") {
         todo.done = data.done;
       }
+
       todos[todoIndex] = todo;
+      res.statusCode = 200;
+      res.end(JSON.stringify(todo));
+      saveTodos(todos);
     });
-    res.statusCode = 200;
-    res.end();
   }
 
   if (method === "DELETE" && path === "todos") {
